@@ -208,6 +208,9 @@ class Application_Model_Export
                 $val = str_replace('"', '\"', $val);
             }
 
+            // TODO FIXME Nitrado Hacks
+            $val = $this->nitradoHacks($templateId, $val);
+
             //Add content to template array
             $fileContent[$templateId]['fileContent'] .= str_replace(
                 array('{KEY}', '{VALUE}'),
@@ -219,6 +222,35 @@ class Application_Model_Export
 
         return $fileContent;
     }
+
+    // TODO FIXME HACKY STUFF BY NITRADO: BEGIN
+    private function nitradoHacks($templateId, $value) {
+        if ($templateId == 4) { // Android
+            $value = str_replace("'", "\'", $value);
+            $value = str_replace("\n", "\\n", $value);
+            if ($this->containsAndroidSpecialChars($value)) {
+                $value = "<![CDATA[" . $value . "]]>";
+            }
+        }
+
+        return $value;
+    }
+
+    private function containsAndroidSpecialChars($string) {
+        if (strpos($string, "<") != false) {
+            return true;
+        }
+
+        if (strpos($string, ">") != false) {
+            return true;
+        }
+
+        if (strpos($string, "&") != false) {
+            return true;
+        }
+        return false;
+    }
+    // TODO FIXME HACKY STUFF BY NITRADO: END
 
     /**
      * Extract meta data for a file and create directory if it doesn't exist
