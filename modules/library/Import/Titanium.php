@@ -47,6 +47,9 @@ class Module_Import_Titanium implements Msd_Import_Interface
                 continue;
             }
             $currentValue = (string)$node[0];
+            // Needed for Android
+            $currentValue = str_replace("\'", "'", $currentValue);
+            $currentValue = str_replace("\\n", "\n", $currentValue);
             $this->_extractedData[$currentKey] = $currentValue;
 
         }
