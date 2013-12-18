@@ -94,6 +94,18 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
         return $ret;
     }
 
+    public function getKeysByTemplate($templateId) {
+        $sql = "SELECT `id`, `key` FROM `{$this->_tableKeys}` "
+               . "WHERE `template_id` = " . $this->_dbo->escape($templateId);
+        $res = $this->_dbo->query($sql, Msd_Db::ARRAY_ASSOC);
+
+        $ret = array();
+        foreach ($res as $data) {
+            $ret[$data['key']] = $data['id'];
+        }
+        return $ret;
+    }
+
     /**
      * Get all language vars of a language and return as ass. array
      *
