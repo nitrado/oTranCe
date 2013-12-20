@@ -6,11 +6,17 @@ class UpdateController extends OtranceController {
     public function updateAction() {
         $params = $this->_request->getParams();
         $file = 'data/export/' . $params[0];
+
+        if (!file_exists($file) || !is_readable($file)) {
+            echo "File does not exists or cannot be read\n"; // TODO
+            return;
+        }
+
         $language = $params[1];
         $fileTemplate = $params[2];
 
         $data = file_get_contents($file);
-        $importer = Msd_Import::factory('titanium');
+        $importer = $this->getImporter((int)$fileTemplate);
         $extracted = $importer->extract($data);
 
         $entriesModel = new Application_Model_LanguageEntries();
@@ -60,6 +66,22 @@ class UpdateController extends OtranceController {
                 $this->saveTranslation($entriesModel, $keyId, $language, $value);
             }
         }
+    }
+
+    private function getImporter($fileTemplate) {
+        $importers = array(
+            4 => 'titanium',
+            7 => 'po',
+            6 => 'po',
+            3 => 'yml',
+            8 => 'ios'
+        );
+
+        if (!array_key_exists($fileTemplate, $importers)) {
+            return null;
+        }
+
+        return Msd_Import::factory($importers[$fileTemplate]);
     }
 
     private function createKey($entriesModel, $key, $fileTemplate) {
