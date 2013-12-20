@@ -231,6 +231,8 @@ class Application_Model_Export
             if ($this->containsAndroidSpecialChars($value)) {
                 $value = "<![CDATA[" . $value . "]]>";
             }
+        } else if ($templateId == 6 || $templateId == 7) { // PO
+            $value = str_replace("\n", "\"\n\"", $value);
         }
 
         return $value;
