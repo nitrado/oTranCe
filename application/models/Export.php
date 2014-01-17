@@ -225,6 +225,9 @@ class Application_Model_Export
 
     // TODO FIXME HACKY STUFF BY NITRADO: BEGIN
     private function nitradoHacks($templateId, $value) {
+        // normalize line endings
+        $value = str_replace("\r\n", "\n", $value);
+
         if ($templateId == 4) { // Android
             $value = str_replace("'", "\'", $value);
             $value = str_replace("\n", "\\n", $value);
