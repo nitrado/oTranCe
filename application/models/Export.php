@@ -213,8 +213,8 @@ class Application_Model_Export
 
             //Add content to template array
             $fileContent[$templateId]['fileContent'] .= str_replace(
-                array('{KEY}', '{VALUE}'),
-                array($keyData['key'], $val),
+                array('{KEY}', '{VALUE}', '{YAML_VALUE}'),
+                array($keyData['key'], $val, trim(str_replace("\n", " ", $val))),
                 $fileContent[$templateId]['langVar']
             );
             $fileContent[$templateId]['fileContent'] .= "\n";
@@ -225,9 +225,6 @@ class Application_Model_Export
 
     // TODO FIXME HACKY STUFF BY NITRADO: BEGIN
     private function nitradoHacks($templateId, $value) {
-        // normalize line endings
-        $value = str_replace("\r\n", "\n", $value);
-
         if ($templateId == 4) { // Android
             $value = str_replace("'", "\'", $value);
             $value = str_replace("\n", "\\n", $value);
@@ -235,7 +232,9 @@ class Application_Model_Export
                 $value = "<![CDATA[" . $value . "]]>";
             }
         } else if ($templateId == 6 || $templateId == 7) { // PO
-            $value = str_replace("\n", "\"\n\"", $value);
+            $value = str_replace("\r\n", "\n", $value);
+            //$value = str_replace("\n", '"' . "\n" . '"' . chr(13).chr(10).'"' . "\n", $value);
+	    $value = str_replace("\n", "\"\n\"".chr(13), $value);
         }
 
         return $value;
