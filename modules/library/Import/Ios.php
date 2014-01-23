@@ -16,7 +16,7 @@ class Module_Import_Ios implements Msd_Import_Interface {
             if ($currentKey == '' || !isset($currentLine[1])) {
                 continue;
             }
-            $extractedData[$currentKey] = trim($currentLine[2]);
+            $extractedData[$currentKey] = str_replace('\"', '"', trim($currentLine[2]));
         }
 
         return $extractedData;
