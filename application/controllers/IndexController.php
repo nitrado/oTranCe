@@ -49,6 +49,7 @@ class IndexController extends OtranceController
     {
         $languagesModel = new Application_Model_Languages();
         $entriesModel   = new Application_Model_LanguageEntries();
+        $templatesModel = new Application_Model_FileTemplates();
 
         $languages = $languagesModel->getAllLanguages();
         $this->view->assign(
@@ -56,7 +57,9 @@ class IndexController extends OtranceController
                  'user'        => $this->_userModel,
                  'languages'   => $languages,
                  'translators' => $this->_userModel->getTranslatorList(false, true),
-                 'status'      => $entriesModel->getStatus($languages)
+                 'status'      => $entriesModel->getStatus($languages),
+                 'statusByTemplate' => $entriesModel->getStatusByTemplate(),
+                 'templates' => $templatesModel->getFileTemplatesAssoc()
             )
         );
     }

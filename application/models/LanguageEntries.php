@@ -148,11 +148,7 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
             $ret[$langId]                  = array();
             $ret[$langId]['notTranslated'] = $totalLanguageVars - $translated;
             $ret[$langId]['translated']    = $translated;
-            $percentTranslated             = 0;
-            if ($totalLanguageVars > 0) {
-                $percentTranslated = (100 * $translated) / $totalLanguageVars;
-            }
-            $ret[$langId]['done']        = round($percentTranslated, 2);
+            $ret[$langId]['done']        = $this->getPercentage($translated, $totalLanguageVars);
             $ret[$langId]['translators'] = '';
             if (isset($translators[$langId])) {
                 $ret[$langId]['translators'] = $translators[$langId];
@@ -160,6 +156,58 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
         }
 
         return $ret;
+    }
+
+    private function getPercentage($translated, $total) {
+        if ($total == 0) {
+            return 0;
+        }
+
+        return round($translated / $total * 100, 2);
+    }
+
+    public function getStatusByTemplate() {
+        $keysByTemplate = $this->getNumberOfKeysByTemplate();
+        $sql = "SELECT
+                    lang_id,
+                    template_id,
+                    COUNT(*) as translated
+                FROM
+                    `" . $this->_tableTranslations . "`,
+                    `" . $this->_tableKeys . "`
+                WHERE
+                    `" . $this->_tableTranslations . "`.key_id = `" . $this->_tableKeys . "` .id
+                GROUP BY
+                    lang_id,
+                    template_id;";
+
+        $result = $this->_dbo->query($sql, Msd_Db::ARRAY_ASSOC, true);
+        $return = array();
+
+        foreach ($result as $current) {
+            $template = $current['template_id'];
+            $language = $current['lang_id'];
+            $translated = $current['translated'];
+            $total = $keysByTemplate[$template];
+            $return[$template][$language] = array(
+                'translated' => $translated,
+                'untranslated' => $total - $translated,
+                'percentage' => $this->getPercentage($translated, $total)
+            );
+        }
+
+        return $return;
+    }
+
+    public function getNumberOfKeysByTemplate() {
+        $sql = "SELECT template_id, count(*) as numberOfKeys FROM `{$this->_tableKeys}` GROUP BY template_ID";
+        $result = $this->_dbo->query($sql, Msd_Db::ARRAY_ASSOC, true);
+
+        $return = array();
+        foreach ($result as $current) {
+            $return[$current['template_id']] = $current['numberOfKeys'];
+        }
+        return $return;
     }
 
     /**

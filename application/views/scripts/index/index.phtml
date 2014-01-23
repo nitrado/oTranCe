@@ -95,3 +95,73 @@ foreach ($this->status as $languageId => $val)
 }
 ?>
 </table>
+
+<?php
+foreach ($this->statusByTemplate as $templateId => $currentTemplate) {
+?>
+<h4 style="padding-top: 1.5em;"><?php echo $this->templates[$templateId]['name'] ?></h4>
+<table class="bdr small">
+    <tr class="thead">
+        <th colspan="3"><?php echo $this->lang->L_LANGUAGE;?></th>
+        <th><?php echo $this->lang->L_PROGRESS;?></th>
+        <th><?php echo $this->getIcon('Ok', $this->lang->L_DONE, 16);?></th>
+        <th><?php echo $this->getIcon('Edit', $this->lang->L_NEEDS_WORK, 16);?></th>
+        <th><?php echo $this->lang->L_DONE;?></th>
+        <th><?php echo $this->lang->L_STATUS;?></th>
+    </tr>
+    <?php
+    $cycleHelper = $this->cycle(array('row-even', 'row-odd'));
+
+    foreach ($currentTemplate as $languageId => $data) {
+        $greenBar         = (int) $data['percentage'] * 2;
+        $redBar           = (int) 200-$greenBar;
+        $untranslatedLink = $this->serverUrl(). $this->baseUrl() . '/entries/index/getUntranslated/' . $languageId;
+        ?>
+        <tr class="<?php echo $cycleHelper->next();?>">
+            <td class="vmiddle">
+                <?php echo $this->printFlag($languageId);?>
+            </td>
+            <td class="vmiddle">
+                <?php echo $this->languages[$languageId]['locale'];?>
+            </td>
+            <td class="vmiddle">
+                <?php echo $this->languages[$languageId]['name'];?>
+            </td>
+            <td class="right vmiddle">
+                <div class="progressBarContainer">
+                    <div class="greenBar" style="width:<?php echo $greenBar;?>px;">&nbsp;</div>
+                    <div class="redBar" style="width:<?php echo $redBar;?>px;">&nbsp;</div>
+                    <div class="progressBarPercentage"><?php echo $data['percentage'];?>%</div>
+                </div>
+            </td>
+            <td class="right vmiddle"><?php echo $this->numberFormat($data['translated']);?></td>
+            <td class="right vmiddle">
+                <?php
+                if ($data['untranslated'] == 0) {
+                    echo '-';
+                } else {
+                    echo $this->numberFormat($data['untranslated']);
+                }
+                ?>
+            </td>
+            <td class="right vmiddle"><?php echo $this->numberFormat($data['percentage'], 2);?>%</td>
+            <td class="nowrap vmiddle">
+                <?php
+                if ($data['percentage'] < 90) {
+                    echo '<span class="error">' . $this->lang->L_NEEDS_WORK . '</span>';
+                } elseif ($data['percentage'] < 98) {
+                    echo '<span class="ok">' . $this->lang->L_OK . '</span>';
+                } else {
+                    echo '<span class="ok">' . $this->lang->L_PERFECT . '!</span>';
+                }
+                ?>
+            </td>
+        </tr>
+        <?php
+    }
+
+    ?>
+</table>
+<?php
+}
+?>
