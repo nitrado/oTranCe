@@ -233,8 +233,7 @@ class Application_Model_Export
             }
         } else if ($templateId == 6 || $templateId == 7) { // PO
             $value = str_replace("\r\n", "\n", $value);
-            //$value = str_replace("\n", '"' . "\n" . '"' . chr(13).chr(10).'"' . "\n", $value);
-	    $value = str_replace("\n", "\"\n\"".chr(13), $value);
+            $value = str_replace("\n", "\\n\"\n\"", $value);
         }
 
         return $value;
