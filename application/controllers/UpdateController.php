@@ -34,8 +34,8 @@ class UpdateController extends OtranceController {
                 }
             }
 
-            foreach ($existingKeys as $keyId) {
-                $entriesModel->deleteEntryByKeyId($keyId);
+            foreach ($existingKeys as $current) {
+                $entriesModel->deleteEntryByKeyId($current['id']);
             }
         } else {
             $currentLanguageTranslation = $entriesModel->getTranslations($language);
@@ -46,7 +46,13 @@ class UpdateController extends OtranceController {
                     // Ignore because key does not exist
                     continue;
                 }
-                $keyId = $existingKeys[$key];
+
+                if (!$existingKeys['justCreated']) {
+                    // Only import newly created keys
+                    continue;
+                }
+
+                $keyId = $existingKeys[$key]['id'];
 
                 if (array_key_exists($keyId, $currentLanguageTranslation)) {
                     // There is already a translation
@@ -66,6 +72,13 @@ class UpdateController extends OtranceController {
                 $this->saveTranslation($entriesModel, $keyId, $language, $value);
             }
         }
+    }
+
+    public function cleanupAction() {
+        $params = $this->_request->getParams();
+        $fileTemplate = $params[0];
+        $entriesModel = new Application_Model_LanguageEntries();
+        $entriesModel->resetJustCreated($fileTemplate);
     }
 
     private function getImporter($fileTemplate) {

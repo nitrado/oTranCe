@@ -95,13 +95,16 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
     }
 
     public function getKeysByTemplate($templateId) {
-        $sql = "SELECT `id`, `key` FROM `{$this->_tableKeys}` "
+        $sql = "SELECT `id`, `key`, `justCreated` FROM `{$this->_tableKeys}` "
                . "WHERE `template_id` = " . $this->_dbo->escape($templateId);
         $res = $this->_dbo->query($sql, Msd_Db::ARRAY_ASSOC);
 
         $ret = array();
         foreach ($res as $data) {
-            $ret[$data['key']] = $data['id'];
+            $ret[$data['key']] = array(
+                'id' => $data['id'],
+                'justCreated' => $data['justCreated'] == '1'
+            );
         }
         return $ret;
     }
@@ -661,7 +664,8 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
         $sql = 'INSERT INTO `' . $this->_database . '`.`' . $this->_tableKeys . '`'
                . ' SET `key`=\'' . $this->_dbo->escape($key) . '\', '
                . '`dt`=\'' . date('Y-m-d H-i-s', time()) . '\', '
-               . '`template_id`=' . intval($templateId);
+               . '`template_id`=' . intval($templateId) . ','
+               . '`justCreated`=1';
         $res = $this->_dbo->query($sql, Msd_Db::SIMPLE);
 
         return $res;
@@ -888,4 +892,13 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
         return (bool)$this->_dbo->query($sql, Msd_Db::SIMPLE);
     }
 
+    public function resetJustCreated($fileTemplate) {
+        $sql = "UPDATE
+                    `{$this->_tableKeys}`
+                SET
+                    justCreated=0
+                WHERE
+                    template_id = '" . intval($fileTemplate) . "';";
+        $this->_dbo->query($sql, Msd_Db::SIMPLE);
+    }
 }
