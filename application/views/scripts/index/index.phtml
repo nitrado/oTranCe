@@ -107,6 +107,7 @@ foreach ($this->statusByTemplate as $templateId => $currentTemplate) {
         <th><?php echo $this->getIcon('Ok', $this->lang->L_DONE, 16);?></th>
         <th><?php echo $this->getIcon('Edit', $this->lang->L_NEEDS_WORK, 16);?></th>
         <th><?php echo $this->lang->L_DONE;?></th>
+        <th>Words</th>
         <th><?php echo $this->lang->L_STATUS;?></th>
     </tr>
     <?php
@@ -145,6 +146,15 @@ foreach ($this->statusByTemplate as $templateId => $currentTemplate) {
                 ?>
             </td>
             <td class="right vmiddle"><?php echo $this->numberFormat($data['percentage'], 2);?>%</td>
+            <td class="right vmiddle">
+                <?php
+                if ($data['words'] != null) {
+                    echo $data['words'];
+                } else {
+                    echo '-';
+                }
+                ?>
+            </td>
             <td class="nowrap vmiddle">
                 <?php
                 if ($data['percentage'] < 90) {

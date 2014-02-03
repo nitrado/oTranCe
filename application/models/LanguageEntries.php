@@ -187,19 +187,40 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
         $result = $this->_dbo->query($sql, Msd_Db::ARRAY_ASSOC, true);
         $return = array();
 
+        $wordStats = $this->readWordStats();
         foreach ($result as $current) {
             $template = $current['template_id'];
             $language = $current['lang_id'];
             $translated = $current['translated'];
+
+            $words = null;
+            if ($wordStats != null
+                && array_key_exists($template, $wordStats)
+                && array_key_exists($language, $wordStats[$template])) {
+                $words = $wordStats[$template][$language];
+            }
+
             $total = $keysByTemplate[$template];
             $return[$template][$language] = array(
                 'translated' => $translated,
                 'untranslated' => $total - $translated,
-                'percentage' => $this->getPercentage($translated, $total)
+                'percentage' => $this->getPercentage($translated, $total),
+                'words' => $words
             );
         }
 
         return $return;
+    }
+
+    private function readWordStats() {
+        $file = APPLICATION_PATH . '/../data/wordcount-stats.json';
+
+        if (!file_exists($file) || !is_readable($file)) {
+            echo "not readable";
+            return null;
+        }
+
+        return json_decode(file_get_contents($file), true);
     }
 
     public function getNumberOfKeysByTemplate() {

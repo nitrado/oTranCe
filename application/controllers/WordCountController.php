@@ -28,9 +28,9 @@ class WordCountController extends OtranceController {
     }
 
     private function writeToFile($stats) {
-        $file = 'data/wordcount-stats.json';
+        $file = APPLICATION_PATH . '/../data/wordcount-stats.json';
         if (!file_exists($file) || !is_writable($file)) {
-            echo "file not writeable";
+            echo "$file not writeable";
             return;
         }
 
