@@ -901,4 +901,21 @@ class Application_Model_LanguageEntries extends Msd_Application_Model
                     template_id = '" . intval($fileTemplate) . "';";
         $this->_dbo->query($sql, Msd_Db::SIMPLE);
     }
+
+    public function getNumberOfUntranslatedWords($template, $language) {
+        $template = intval($template);
+        $language = intval($language);
+        $sql = "SELECT SUM( wordcount(`text`) ) AS untranslated
+                FROM translations
+                WHERE lang_id = 2
+                AND key_id IN (
+                    SELECT `keys`.id
+                    FROM `keys`
+                    WHERE template_id = {$template}
+                    AND (SELECT count(lang_id) FROM translations WHERE lang_id = {$language} AND key_id = `keys`.id) = 0
+                )";
+
+        $result = $this->_dbo->query($sql, Msd_Db::ARRAY_ASSOC);
+        return $result[0]['untranslated'] != null ?  intval($result[0]['untranslated']) : 0;
+    }
 }
