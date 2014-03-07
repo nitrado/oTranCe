@@ -87,7 +87,8 @@ class UpdateController extends OtranceController {
             7 => 'po',
             6 => 'po',
             3 => 'yml',
-            8 => 'ios'
+            8 => 'ios',
+            10 => 'PhpArray'
         );
 
         if (!array_key_exists($fileTemplate, $importers)) {
