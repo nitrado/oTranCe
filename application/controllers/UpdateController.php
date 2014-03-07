@@ -47,7 +47,7 @@ class UpdateController extends OtranceController {
                     continue;
                 }
 
-                if (!$existingKeys['justCreated']) {
+                if (!$existingKeys[$key]['justCreated']) {
                     // Only import newly created keys
                     continue;
                 }
